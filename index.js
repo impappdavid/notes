@@ -35,16 +35,47 @@ const getNoteByIdHandler = async (req, res) => {
 
         const note = notes.find(note => note.id === parseInt(id));
 
-        if(note){
-            res.statusCode= 200;
+        if (note) {
+            res.statusCode = 200;
             res.write(JSON.stringify(note))
         }
     } catch (error) {
         res.statusCode = 404;
-        res.write(JSON.stringify({message: 'Not found'}))
+        res.write(JSON.stringify({ message: 'Not found' }))
     }
     res.end();
-    
+
+}
+
+const removeNoteByIdHandler = async (req, res) => {
+    const id = req.url.split('/')[2];
+    try {
+        const data = await fs.readFile('./public/notes.json', 'utf-8')
+        const notes = JSON.parse(data)
+
+        const note = notes.filter(note => note.id !== parseInt(id));
+
+        req.on('end', async () => {
+            try {
+                try {
+                    await fs.writeFile('./public/notes.json', `${JSON.stringify(note)}`)
+                } catch (error) {
+                    console.log(error)
+                }
+                res.statusCode = 201;
+                res.write(JSON.stringify(note));
+                res.end();
+            } catch (error) {
+                console.log(error)
+            }
+
+        })
+    } catch (error) {
+        res.statusCode = 404;
+        res.write(JSON.stringify({ message: 'Not found' }))
+    }
+    res.end();
+
 }
 
 const createNewNoteHandler = async (req, res) => {
@@ -58,7 +89,7 @@ const createNewNoteHandler = async (req, res) => {
         req.on('data', (chunk) => {
             body += chunk.toString();
         });
-    
+
         req.on('end', async () => {
             const note = JSON.parse(body);
 
@@ -77,13 +108,13 @@ const createNewNoteHandler = async (req, res) => {
             } catch (error) {
                 console.log(error)
             }
-    
+
         })
 
     } catch (error) {
         console.log(error)
     }
-    
+
 }
 
 const notFoundHandler = (req, res) => {
@@ -101,7 +132,9 @@ const server = createServer((req, res) => {
                 createNewNoteHandler(req, res)
             } else if (req.url.match(/\/notes\/([0-9]+)/) && req.method === 'GET') {
                 getNoteByIdHandler(req, res);
-            } else{
+            } else if (req.url.match(/\/notes\/([0-9]+)/) && req.method === 'DELETE') {
+                removeNoteByIdHandler(req, res);
+            } else {
                 notFoundHandler(req, res);
             }
         })
