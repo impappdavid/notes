@@ -14,8 +14,8 @@ This is a simple Notes API built using **vanilla Node.js** — no Express, no fr
 
 ## 📂 Project Structure
 
-├── index.js # Main file
-├── public/
+├── index.js # Main file<br>
+├── public/<br>
 │ └── note.json # Stores notes as JSON
 
 ---
