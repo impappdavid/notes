@@ -1,0 +1,16 @@
+{
+  "name": "notes",
+  "version": "1.0.0",
+  "description": "Practicing nodejs",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon --env-file=.env server2.js"
+  },
+  "keywords": [],
+  "author": "Papp David",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
