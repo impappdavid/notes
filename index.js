@@ -25,14 +25,54 @@ const getNotesHandler = async (_, res) => {
     } catch (error) {
         console.log(error)
     }
-
 };
+
+const createNewNoteHandler = async (req, res) => {
+    let body = "";
+
+    try {
+        const data = await fs.readFile('./public/notes.json', 'utf-8')
+        const notes = JSON.parse(data)
+
+
+        req.on('data', (chunk) => {
+            body += chunk.toString();
+        });
+    
+        req.on('end', async () => {
+            const note = JSON.parse(body);
+
+            notes.push(note);
+
+            console.log(notes)
+            try {
+                try {
+                    await fs.writeFile('./public/notes.json', `${JSON.stringify(notes)}`)
+                } catch (error) {
+                    console.log(error)
+                }
+                res.statusCode = 201;
+                res.write(JSON.stringify(note));
+                res.end();
+            } catch (error) {
+                console.log(error)
+            }
+    
+        })
+
+    } catch (error) {
+        console.log(error)
+    }
+    
+}
 
 const server = createServer((req, res) => {
     logger(req, res, () => {
         jsonMiddleware(req, res, () => {
             if (req.url === '/notes' && req.method === 'GET') {
                 getNotesHandler(req, res);
+            } else if (req.url === '/notes' && req.method === 'POST') {
+                createNewNoteHandler(req, res)
             }
         })
     })
