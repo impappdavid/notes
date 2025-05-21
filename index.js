@@ -27,6 +27,26 @@ const getNotesHandler = async (_, res) => {
     }
 };
 
+const getNoteByIdHandler = async (req, res) => {
+    const id = req.url.split('/')[2];
+    try {
+        const data = await fs.readFile('./public/notes.json', 'utf-8')
+        const notes = JSON.parse(data)
+
+        const note = notes.find(note => note.id === parseInt(id));
+
+        if(note){
+            res.statusCode= 200;
+            res.write(JSON.stringify(note))
+        }
+    } catch (error) {
+        res.statusCode = 404;
+        res.write(JSON.stringify({message: 'Not found'}))
+    }
+    res.end();
+    
+}
+
 const createNewNoteHandler = async (req, res) => {
     let body = "";
 
@@ -66,6 +86,12 @@ const createNewNoteHandler = async (req, res) => {
     
 }
 
+const notFoundHandler = (req, res) => {
+    res.statusCode = 404;
+    res.write(JSON.stringify({ message: 'Not Found' }));
+    res.end();
+}
+
 const server = createServer((req, res) => {
     logger(req, res, () => {
         jsonMiddleware(req, res, () => {
@@ -73,6 +99,10 @@ const server = createServer((req, res) => {
                 getNotesHandler(req, res);
             } else if (req.url === '/notes' && req.method === 'POST') {
                 createNewNoteHandler(req, res)
+            } else if (req.url.match(/\/notes\/([0-9]+)/) && req.method === 'GET') {
+                getNoteByIdHandler(req, res);
+            } else{
+                notFoundHandler(req, res);
             }
         })
     })
