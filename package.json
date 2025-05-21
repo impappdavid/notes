@@ -4,7 +4,7 @@
   "description": "Practicing nodejs",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --env-file=.env server2.js"
+    "start": "nodemon --env-file=.env index.js"
   },
   "keywords": [],
   "author": "Papp David",
